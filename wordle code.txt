@@ -1,0 +1,72 @@
+import random
+
+
+def load_word_list(filename):
+    with open(filename, 'r') as file:
+        word_list = [word.strip().lower() for word in file.readlines()]
+    return word_list
+
+
+def choose_secret_word(word_list):
+    return random.choice(word_list)
+
+
+def evaluate_guess(secret_word, guess):
+    evaluation = ''
+    guessed_letters = set()
+
+    for i in range(len(secret_word)):
+        if guess[i] == secret_word[i]:
+            evaluation += guess[i].upper()
+            guessed_letters.add(guess[i])
+        elif guess[i] in secret_word:
+            if guess[i] in guessed_letters:
+                evaluation += '_'
+            else:
+                evaluation += guess[i].lower()
+                guessed_letters.add(guess[i])
+        else:
+            evaluation += '_'
+
+    return evaluation
+
+
+def play_wordle():
+    word_list = load_word_list('word_list.txt')
+
+    while True:
+        secret_word = choose_secret_word(word_list)
+        tries = 6
+        print("\nWelcome to Wordle! Guess the 5-letter word.")
+
+        while tries > 0:
+            guess = input(f"\nTries left: {tries}\nEnter your guess: ").strip().lower()
+
+            if len(guess) != 5:
+                print("Please enter a 5-letter word.")
+                continue
+
+            if guess == '0':
+                print("You cannot enter a 0-word input.")
+                continue
+
+            if guess == secret_word:
+                print(f"Congratulations! You've guessed the word: {secret_word}")
+                break
+
+            evaluation = evaluate_guess(secret_word, guess)
+            print("Evaluation:", ' '.join(evaluation))
+
+            tries -= 1
+
+        if tries == 0:
+            print(f"\nOut of tries! The word was: {secret_word}")
+
+        replay = input("\nDo you want to play again? (yes/no): ").strip().lower()
+        if replay != 'yes':
+            print("Thanks for playing!")
+            break
+
+
+if __name__ == '__main__':
+    play_wordle()
